@@ -2,8 +2,12 @@
 
 namespace wodrow\yii2wsoftdelete;
 
+use yii\db\Exception;
 use yii\db\QueryBuilder;
 
+/**
+ * @property $deletedAtAttribute
+ */
 class ActiveQuery extends \yii\db\ActiveQuery
 {
     protected $_deletedAtAttribute;
@@ -50,20 +54,27 @@ class ActiveQuery extends \yii\db\ActiveQuery
 
     public function withTrashed()
     {
+        if (!$this->deletedAtAttribute) {
+            throw new Exception("place set delete at attribute to use withTrashed()");
+        }
         $this->_trashed = static::WITH_TRASHED;
-
         return $this;
     }
 
     public function withoutTrashed()
     {
+        if (!$this->deletedAtAttribute) {
+            throw new Exception("place set delete at attribute to use withoutTrashed()");
+        }
         $this->_trashed = static::WITHOUT_TRASHED;
-
         return $this;
     }
 
     public function onlyTrashed()
     {
+        if (!$this->deletedAtAttribute) {
+            throw new Exception("place set delete at attribute to use onlyTrashed()");
+        }
         $this->_trashed = static::ONLY_TRASHED;
 
         return $this;

@@ -38,9 +38,10 @@ class SoftDeleteBehavior extends TimestampBehavior
         if ($this->withTimestamp) {
             parent::init();
         }
-
-        $this->attributes = array_merge($this->attributes, [
-            static::EVENT_BEFORE_SOFT_DELETE => $this->deletedAtAttribute,
-        ]);
+        if ($this->deletedAtAttribute) {
+            $this->attributes = array_merge($this->attributes, [
+                static::EVENT_BEFORE_SOFT_DELETE => $this->deletedAtAttribute,
+            ]);
+        }
     }
 }

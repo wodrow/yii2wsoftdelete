@@ -6,6 +6,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\ModelEvent;
 use yii\db\ActiveQueryInterface;
+use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
 
@@ -23,10 +24,11 @@ trait SoftDeleteTrait
     public static function find()
     {
         if (static::getDeletedAtAttribute()) {
+            /** @var ActiveQuery $aq */
             $aq = Yii::createObject(ActiveQuery::className(), [get_called_class()]);
             $aq->setDeletedAtAttribute(static::getDeletedAtAttribute());
         } else {
-            $aq = Yii::createObject('yii\db\ActiveQuery', [get_called_class()]);
+            $aq = parent::find();
         }
         return $aq;
     }
@@ -37,7 +39,7 @@ trait SoftDeleteTrait
      */
     public static function findWithTrashed()
     {
-        $query =  static::find();
+        $query = static::find();
         return $query->withTrashed();
     }
 
@@ -47,7 +49,7 @@ trait SoftDeleteTrait
      */
     public static function findOnlyTrashed()
     {
-        $query =  static::find();
+        $query = static::find();
         return $query->onlyTrashed();
     }
 
@@ -206,6 +208,9 @@ trait SoftDeleteTrait
 
     protected function deleteInternal()
     {
+        if (!static::getDeletedAtAttribute()) {
+            throw new Exception("place unset SoftDeleteTrait!");
+        }
         if ( ! $this->beforeDelete()) {
             return false;
         }
