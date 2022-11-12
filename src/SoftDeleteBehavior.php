@@ -2,6 +2,7 @@
 
 namespace wodrow\yii2wsoftdelete;
 
+use yii\behaviors\TimestampBehavior;
 
 /**
  * Class SoftDeleteBehavior
