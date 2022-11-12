@@ -1,21 +1,14 @@
-yii2wajaxcrud 
-=============
+Yii2 SoftDelete
+===============
+[![Build Status](https://travis-ci.org/wodrow/yii2wsoftdelete.svg)](https://travis-ci.org/wodrow/yii2wsoftdelete)
+[![Latest Stable Version](https://poser.pugx.org/wodrow/yii2wsoftdelete/v/stable.svg)](https://packagist.org/packages/wodrow/yii2wsoftdelete)
+[![Total Downloads](https://poser.pugx.org/wodrow/yii2wsoftdelete/downloads.svg)](https://packagist.org/packages/wodrow/yii2wsoftdelete)
+[![Latest Unstable Version](https://poser.pugx.org/wodrow/yii2wsoftdelete/v/unstable.svg)](https://packagist.org/packages/wodrow/yii2wsoftdelete)
+[![License](https://poser.pugx.org/wodrow/yii2wsoftdelete/license.svg)](https://packagist.org/packages/wodrow/yii2wsoftdelete)
 
-[![Latest Stable Version](https://poser.pugx.org/wodrow/yii2wajaxcrud/v/stable)](https://packagist.org/packages/wodrow/yii2wajaxcrud)
-[![License](https://poser.pugx.org/wodrow/yii2wajaxcrud/license)](https://packagist.org/packages/wodrow/yii2wajaxcrud)
-[![Total Downloads](https://poser.pugx.org/wodrow/yii2wajaxcrud/downloads)](https://packagist.org/packages/wodrow/yii2wajaxcrud)
+Soft delete extension for Yii2 framework.
 
-Gii CRUD template for Single Page Ajax Administration for yii2 
-
-
-Features
-------------
-+ Create, read, update, delete in onpage with Ajax
-+ Bulk delete suport
-+ Pjax widget suport
-+ Export function(pdf,html,text,csv,excel,json)
-+ Editable suport
-+ Daterange suport
+This extension ensures that soft-deleted has delete native consistent behavior and is IDE-friendly.
 
 Installation
 ------------
@@ -25,17 +18,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist wodrow/yii2wajaxcrud "^2.1"
-or
-php composer.phar require --prefer-dist wodrow/yii2wajaxcrud "^3.0"
+php composer.phar require --prefer-dist wodrow/yii2wsoftdelete "^1.0.0"
 ```
 
 or add
 
 ```
-"wodrow/yii2wajaxcrud": "^2.1"
-or
-"wodrow/yii2wajaxcrud": "^3.0"
+"wodrow/yii2wsoftdelete": "^1.0.0"
 ```
 
 to the require section of your `composer.json` file.
@@ -43,41 +32,63 @@ to the require section of your `composer.json` file.
 
 Usage
 -----
-For first you must enable Gii module Read more about [Gii code generation tool](http://www.yiiframework.com/doc-2.0/guide-tool-gii.html)
 
-Because this extension used [kartik-v/yii2-grid](https://github.com/kartik-v/yii2-grid) extensions so we must config gridview module before
+Once the extension is installed, simply use it in your code by  :
 
-Let 's add into modules config in your main config file
-````php
-'modules' => [
-    'gridview' =>  [
-        'class' => '\kartik\grid\Module'
-    ]       
-]
-````
+Edit model class:
+```php
+use wodrow\softdelete\SoftDeleteBehavior;
+use wodrow\softdelete\SoftDelete;
 
-gii config like
-````php
-$config['bootstrap'][] = 'gii';
-$config['modules']['gii'] = [
-    'class' => 'yii\gii\Module',
-];
-$config['modules']['gii']['generators']['wodrowmodel'] = [
-    'class' => \wodrow\wajaxcrud\generators\model\Generator::class,
-    'showName' => "YOUR MODEL GENERATOR",
-];
-$config['modules']['gii']['generators']['wodrowwajaxcrud'] = [
-    'class' => \wodrow\wajaxcrud\generators\crud\Generator::class,
-    'showName' => "YOUR AJAX CRUD GENERATOR",
-];
-````
+class Model extends \yii\db\ActiveRecord
+{
+    use SoftDelete;
 
-You can then access Gii through the following URL:
+    public function behaviors()
+    {
+        return [
+            'class' => SoftDeleteBehavior::className(),
+        ];
+    }
+}
+```
 
-http://localhost/path/to/index.php?r=gii
+Change database table structures, add `deleted_at (int 11 unsigned)` field and attached to UNIQUE index.
 
-and you can see <b>YOUR AJAX CRUD GENERATOR</b>
+API
+---
 
-![exp1](https://i.loli.net/2019/05/09/5cd3a7c2cb95a.png)
-![exp2](https://i.loli.net/2019/05/09/5cd3a7c2cee7a.png)
-![exp3](https://i.loli.net/2019/05/09/5cd3a7c2d14a9.png)
+### ActiveRecord class (SoftDelete Trait):
+
+find系列方法会返回 `wodrow\softdelete\ActiveQuery` 对象。
+
++ softDelete() 使用软删除模式删除数据
++ forceDelete() 使用物理删除模式强制删除数据
++ restore() 恢复被软删除的模型数据
++ isTrashed() 是否被软删除
+
+以下命令分别是 `find()` / `findOne()` / `findAll()` 在不同模式下的对应版本：
+
+所有模型（包括被软删除的）：
+
++ findWithTrashed()
++ findOneWithTrashed($condition)
++ findAllWithTrashed($condition)
+
+只查找被软删除的模型：
+
++ findOnlyTrashed()
++ findOneOnlyTrashed($condition)
++ findAllOnlyTrashed($condition)
+
+以下的命令均被重写成软删除版本：
+
++ find()
++ findOne()
++ findAll()
++ delete()
+
+### wodrow\softdelete\ActiveQuery
+
+增加了 `withTrashed()`, `withoutTrashed()` 和 `onlyTrashed()` 三个方法，
+设置相应的查找模式。
