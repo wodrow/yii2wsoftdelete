@@ -18,13 +18,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist wodrow/yii2wsoftdelete "^1.0.0"
+php composer.phar require --prefer-dist wodrow/yii2wsoftdelete "^1.0.1"
 ```
 
 or add
 
 ```
-"wodrow/yii2wsoftdelete": "^1.0.0"
+"wodrow/yii2wsoftdelete": "^1.0.1"
 ```
 
 to the require section of your `composer.json` file.
@@ -38,17 +38,30 @@ Once the extension is installed, simply use it in your code by  :
 Edit model class:
 ```php
 use wodrow\softdelete\SoftDeleteBehavior;
-use wodrow\softdelete\SoftDelete;
+use wodrow\softdelete\SoftDeleteTrait;
 
 class Model extends \yii\db\ActiveRecord
 {
-    use SoftDelete;
+    use SoftDeleteTrait;
+
+    public static function getDeletedAtAttribute()
+    {
+        return "deleted_at";
+    }
 
     public function behaviors()
     {
-        return [
-            'class' => SoftDeleteBehavior::className(),
-        ];
+        $behaviors = parent::behaviors();
+        $behaviors = ArrayHelper::merge($behaviors, []);
+        if (static::getDeletedAtAttribute()) {
+            $behaviors = ArrayHelper::merge($behaviors, [
+                'soft-delete' => [
+                    'class' => SoftDeleteBehavior::class,
+                    'deletedAtAttribute' => static::getDeletedAtAttribute(),
+                ],
+            ]);
+        }
+        return $behaviors;
     }
 }
 ```

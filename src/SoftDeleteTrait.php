@@ -22,8 +22,12 @@ trait SoftDeleteTrait
      */
     public static function find()
     {
-        $aq = Yii::createObject(ActiveQuery::className(), [get_called_class()]);
-        $aq->setDeletedAtAttribute(static::getDeletedAtAttribute());
+        if (static::getDeletedAtAttribute()) {
+            $aq = Yii::createObject(ActiveQuery::className(), [get_called_class()]);
+            $aq->setDeletedAtAttribute(static::getDeletedAtAttribute());
+        } else {
+            $aq = Yii::createObject('yii\db\ActiveQuery', [get_called_class()]);
+        }
         return $aq;
     }
 
