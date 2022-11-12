@@ -117,7 +117,7 @@ trait SoftDelete
             return true;
         }
 
-        $this->{static::$deletedAtAttribute} = null;
+        $this->{static::$deletedAtAttribute} = 0;
         $result = $this->save();
         $this->afterRestore();
 

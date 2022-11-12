@@ -28,10 +28,10 @@ class ActiveQuery extends \yii\db\ActiveQuery
         $query = parent::prepare($builder);
         switch ($this->getTrashed()) {
             case static::WITHOUT_TRASHED:
-                $query->andWhere(['is', $this->deletedAtAttribute, null]);
+                $query->andWhere(['=', $this->deletedAtAttribute, 0]);
                 break;
             case static::ONLY_TRASHED:
-                $query->andWhere(['!=', $this->deletedAtAttribute, '']);
+                $query->andWhere(['>', $this->deletedAtAttribute, 0]);
                 break;
             case static::WITH_TRASHED: // No break;
             default:
