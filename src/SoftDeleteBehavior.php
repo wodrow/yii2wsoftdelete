@@ -8,7 +8,7 @@ use yii\behaviors\TimestampBehavior;
  * Class SoftDeleteBehavior
  *
  * ```php
- * use yiithings\softdelete\behaviors\SoftDeleteBehavior;
+ * use wodrow\yii2wsoftdelete\behaviors\SoftDeleteBehavior;
  *
  * public function behaviors()
  * {
@@ -18,8 +18,7 @@ use yii\behaviors\TimestampBehavior;
  * }
  * ```
  *
- * @package yiithings\softdelete\behaviors
- * @property $owner
+ * @package wodrow\yii2wsoftdelete
  */
 class SoftDeleteBehavior extends TimestampBehavior
 {

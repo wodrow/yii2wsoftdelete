@@ -6,14 +6,21 @@ use yii\db\QueryBuilder;
 
 class ActiveQuery extends \yii\db\ActiveQuery
 {
+    protected $_deletedAtAttribute;
+
+    public function setDeletedAtAttribute($deletedAtAttribute)
+    {
+        $this->_deletedAtAttribute = $deletedAtAttribute;
+    }
+
+    public function getDeletedAtAttribute()
+    {
+        return $this->_deletedAtAttribute;
+    }
+    
     const WITH_TRASHED = 0;
     const WITHOUT_TRASHED = 1;
     const ONLY_TRASHED = 2;
-
-    /**
-     * @var string
-     */
-    public $deletedAtAttribute = 'deleted_at';
     /**
      * @var int
      */
